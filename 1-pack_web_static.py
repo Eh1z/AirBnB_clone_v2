@@ -1,19 +1,25 @@
 #!/usr/bin/python3
+"""Compress web static package
+"""
 from fabric.api import local
-from time import strftime
-from datetime import date
+from datetime import datetime
 
 
 def do_pack():
-    """ A script that generates archive the contents of web_static folder"""
+    """Function to compress directory
 
-    filename = strftime("%Y%m%d%H%M%S")
-    try:
-        local("mkdir -p versions")
-        local("tar -czvf versions/web_static_{}.tgz web_static/"
-              .format(filename))
+    Return: path to archive on success; None on fail
+    """
+    # Get current time
+    now = datetime.now()
+    now = now.strftime('%Y%m%d%H%M%S')
+    archive_path = 'versions/web_static_' + now + '.tgz'
 
-        return "versions/web_static_{}.tgz".format(filename)
+    # Create archive
+    local('mkdir -p versions/')
+    result = local('tar -cvzf {} web_static/'.format(archive_path))
 
-    except Exception as e:
-        return None
+    # Check if archiving was successful
+    if result.succeeded:
+        return archive_path
+    return None
